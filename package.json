@@ -1,0 +1,26 @@
+{
+  "name": "motion_game",
+  "version": "1.0.0",
+  "description": "A game of motion , where ball is navigated to goal through obstacles in minimum moves",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AayanMujawar/Motion_Game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/AayanMujawar/Motion_Game/issues"
+  },
+  "homepage": "https://github.com/AayanMujawar/Motion_Game#readme",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
+    "body-parser": "^2.2.2",
+    "express": "^5.2.1"
+  }
+}
