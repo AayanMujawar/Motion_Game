@@ -3,26 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Anti-Gravity Puzzle</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+  <title>Block Puzzle — Slide to the Hole</title>
+  <meta name="description" content="A sliding block puzzle game. Move objects up/down/left/right to reach the hole.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="game-container">
-  <h1>Anti-Gravity Puzzle</h1>
-  
-  <div id="grid"></div>
-  
-  <p class="stats">Moves: <span id="moves">0</span></p>
+<div id="app">
+  <!-- Header -->
+  <header id="header">
+    <button id="menu-btn" class="icon-btn" aria-label="Menu">
+      <span class="material-icons-round">menu</span>
+    </button>
+    <div id="level-indicator">
+      <span id="level-label">Level</span>
+      <span id="level-number">1</span>
+    </div>
+    <button id="reset-btn" class="icon-btn" aria-label="Reset Level">
+      <span class="material-icons-round">refresh</span>
+    </button>
+  </header>
+
+  <!-- Instruction -->
+  <p id="instruction">Move objects up/down/left/right to reach the hole.</p>
+
+  <!-- Game Board -->
+  <div id="board-wrapper">
+    <div id="board"></div>
+  </div>
+
+  <!-- Bottom Toolbar -->
+  <div id="toolbar">
+    <div id="move-counter">
+      <span class="material-icons-round">swap_horiz</span>
+      <span id="moves">0</span>
+    </div>
+    <button id="undo-btn" class="tool-btn" aria-label="Undo">
+      <span class="material-icons-round">undo</span>
+    </button>
+    <button id="next-btn" class="tool-btn primary" aria-label="Next Level" disabled>
+      <span class="material-icons-round">arrow_forward</span>
+    </button>
+  </div>
 </div>
 
-<!-- Start overlay to initialize audio context / device orientation on iOS -->
-<div id="start-overlay" class="overlay">
-  <div class="overlay-content">
-    <h2>Ready to Play?</h2>
-    <p>Tilt your device to move the ball to the hole.</p>
-    <button id="start-btn">Start Game</button>
+<!-- Win Modal -->
+<div id="win-modal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-icon">🎉</div>
+    <h2>Level Complete!</h2>
+    <p id="win-moves-text">You solved it in <strong><span id="win-moves">0</span></strong> moves</p>
+    <div class="modal-stars" id="stars"></div>
+    <button id="modal-next-btn" class="btn-primary">Next Level</button>
+  </div>
+</div>
+
+<!-- Level Select Modal -->
+<div id="level-modal" class="modal hidden">
+  <div class="modal-card level-select-card">
+    <h2>Select Level</h2>
+    <div id="level-grid"></div>
+    <button id="close-level-modal" class="btn-secondary">Close</button>
   </div>
 </div>
 
