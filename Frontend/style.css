@@ -207,6 +207,33 @@ html, body {
   box-shadow: 0 0 6px rgba(255,255,255,0.4);
 }
 
+/* ======= VALID PLACEMENT TARGETS ======= */
+.grid-cell.valid-target {
+  background: rgba(52, 168, 83, 0.18);
+  border: 2px dashed rgba(52, 168, 83, 0.5);
+  cursor: pointer;
+  animation: pulseTarget 1.5s ease-in-out infinite;
+}
+.grid-cell.valid-target:hover {
+  background: rgba(52, 168, 83, 0.35);
+  border-color: rgba(52, 168, 83, 0.8);
+  transform: scale(1.04);
+}
+
+.hole.valid-target {
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.5), 0 0 0 3px rgba(52, 168, 83, 0.6);
+  cursor: pointer;
+  animation: pulseTarget 1.5s ease-in-out infinite;
+}
+.hole.valid-target:hover {
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.5), 0 0 0 4px rgba(52, 168, 83, 0.9), 0 0 16px rgba(52, 168, 83, 0.3);
+}
+
+@keyframes pulseTarget {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
 /* ======= HOLE ======= */
 .hole {
   position: absolute;
