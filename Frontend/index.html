@@ -4,25 +4,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Block Puzzle — Slide to the Hole</title>
+  <title>Ice Slide Puzzle — Slide to the Hole</title>
   <meta name="description"
-    content="A pick-and-place block puzzle game. Tap a piece, then tap an empty cell to place it. Get the ball into the hole!">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    content="An ice-slide puzzle game. Select a piece and slide it in 4 directions. Get the ball into the hole in minimum moves!">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <!-- Confetti Layer -->
+  <div id="confetti-container"></div>
 
   <div id="app">
     <!-- Header -->
     <header id="header">
-      <button id="menu-btn" class="icon-btn" aria-label="Menu">
+      <button id="menu-btn" class="icon-btn" aria-label="Level Select">
         <span class="material-icons-round">menu</span>
       </button>
       <div id="level-indicator">
         <span id="level-label">Level</span>
         <span id="level-number">1</span>
+        <span id="level-name">First Slide</span>
       </div>
       <button id="reset-btn" class="icon-btn" aria-label="Reset Level">
         <span class="material-icons-round">refresh</span>
@@ -30,11 +34,30 @@
     </header>
 
     <!-- Instruction -->
-    <p id="instruction">Tap a piece, then tap an empty cell to place it. Get the ball into the hole!</p>
+    <p id="instruction">Swipe or use arrows to slide the ball. Tap a block to select it.</p>
 
     <!-- Game Board -->
     <div id="board-wrapper">
       <div id="board"></div>
+    </div>
+
+    <!-- D-Pad Controls -->
+    <div id="dpad">
+      <button id="dpad-up" class="dpad-btn" aria-label="Slide Up">
+        <span class="material-icons-round">arrow_upward</span>
+      </button>
+      <div id="dpad-middle">
+        <button id="dpad-left" class="dpad-btn" aria-label="Slide Left">
+          <span class="material-icons-round">arrow_back</span>
+        </button>
+        <div id="dpad-center"></div>
+        <button id="dpad-right" class="dpad-btn" aria-label="Slide Right">
+          <span class="material-icons-round">arrow_forward</span>
+        </button>
+      </div>
+      <button id="dpad-down" class="dpad-btn" aria-label="Slide Down">
+        <span class="material-icons-round">arrow_downward</span>
+      </button>
     </div>
 
     <!-- Bottom Toolbar -->
@@ -42,6 +65,8 @@
       <div id="move-counter">
         <span class="material-icons-round">swap_horiz</span>
         <span id="moves">0</span>
+        <span class="move-separator">/</span>
+        <span id="min-moves" class="min-moves-val">1</span>
       </div>
       <button id="undo-btn" class="tool-btn" aria-label="Undo">
         <span class="material-icons-round">undo</span>
@@ -57,7 +82,20 @@
     <div class="modal-card">
       <div class="modal-icon">🎉</div>
       <h2>Level Complete!</h2>
-      <p id="win-moves-text">You solved it in <strong><span id="win-moves">0</span></strong> moves</p>
+      <div class="win-stats">
+        <div class="stat">
+          <span class="stat-label">Moves</span>
+          <span class="stat-value" id="win-moves">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Target</span>
+          <span class="stat-value target" id="win-min">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Best</span>
+          <span class="stat-value best" id="win-best">0</span>
+        </div>
+      </div>
       <div class="modal-stars" id="stars"></div>
       <button id="modal-next-btn" class="btn-primary">Next Level</button>
     </div>
