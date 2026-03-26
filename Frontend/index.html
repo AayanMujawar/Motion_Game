@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Ice Slide Puzzle — Slide to the Hole</title>
+  <title>Motion Puzzle — Pick &amp; Place</title>
   <meta name="description"
-    content="An ice-slide puzzle game. Select a piece and slide it in 4 directions. Get the ball into the hole in minimum moves!">
+    content="A motion puzzle game. Select a piece and place it on a valid cell in 4 cardinal directions. Get the ball into the hole in minimum moves!">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
@@ -34,30 +34,11 @@
     </header>
 
     <!-- Instruction -->
-    <p id="instruction">Swipe or use arrows to slide the ball. Tap a block to select it.</p>
+    <p id="instruction">Tap the ball or a movable block to select it.</p>
 
     <!-- Game Board -->
     <div id="board-wrapper">
       <div id="board"></div>
-    </div>
-
-    <!-- D-Pad Controls -->
-    <div id="dpad">
-      <button id="dpad-up" class="dpad-btn" aria-label="Slide Up">
-        <span class="material-icons-round">arrow_upward</span>
-      </button>
-      <div id="dpad-middle">
-        <button id="dpad-left" class="dpad-btn" aria-label="Slide Left">
-          <span class="material-icons-round">arrow_back</span>
-        </button>
-        <div id="dpad-center"></div>
-        <button id="dpad-right" class="dpad-btn" aria-label="Slide Right">
-          <span class="material-icons-round">arrow_forward</span>
-        </button>
-      </div>
-      <button id="dpad-down" class="dpad-btn" aria-label="Slide Down">
-        <span class="material-icons-round">arrow_downward</span>
-      </button>
     </div>
 
     <!-- Bottom Toolbar -->

@@ -1,18 +1,19 @@
 /* ============================================================
-   ICE-SLIDE PUZZLE – game.js
-   Pieces slide in 4 cardinal directions until hitting a wall
-   or another piece. Get the ball into the hole!
+   MOTION PUZZLE – game.js
+   Pick-and-place puzzle: select a piece, then tap a valid cell
+   in one of the 4 cardinal directions to place it there.
+   Get the ball into the hole!
    ============================================================ */
 
 // ── Constants ──────────────────────────────────────────────
-const SLIDE_SPEED = 60; // ms per cell for animation
+const MOVE_DURATION = 200; // ms for move animation
 
 // ── Levels ─────────────────────────────────────────────────
 // All levels use a 6×6 grid.
 // ball: {x, y}  hole: {x, y}
 // blocks: [{id, x, y, color, fixed}]
 //   fixed=true → immovable wall (gray)
-//   fixed=false → movable obstacle (slides like ball)
+//   fixed=false → movable obstacle (can be picked and placed)
 // minMoves: stated optimal solution length.
 
 const LEVELS = [
@@ -343,7 +344,8 @@ const LEVELS = [
 // ── State ──────────────────────────────────────────────────
 let currentLevel  = 0;
 let moves         = 0;
-let selectedPiece = null;   // index into pieces array, or 'ball'
+let selectedPiece = null;   // index into blocks array, or 'ball'
+let validMoves    = [];     // array of {x, y} valid destination cells
 let history       = [];     // undo stack
 let gameActive    = true;
 let isAnimating   = false;
@@ -399,10 +401,6 @@ const modalNextBtn  = document.getElementById('modal-next-btn');
 const levelModal    = document.getElementById('level-modal');
 const levelGrid     = document.getElementById('level-grid');
 const closeLevelBtn = document.getElementById('close-level-modal');
-const dpadUp        = document.getElementById('dpad-up');
-const dpadDown      = document.getElementById('dpad-down');
-const dpadLeft      = document.getElementById('dpad-left');
-const dpadRight     = document.getElementById('dpad-right');
 const instructionEl = document.getElementById('instruction');
 
 // ── Board sizing ───────────────────────────────────────────
@@ -413,153 +411,119 @@ function updateBoardSize() {
 
 function cellPx() { return boardPx / gameState.cols; }
 
-// ── Slide Mechanic ─────────────────────────────────────────
-// Returns the target {x, y} after sliding in a direction.
-// piece: {x, y}  allPieces: array of {x, y} (includes ball + blocks, excluding the moving piece)
-function getSlideTarget(piece, direction, allPieces) {
-  let { x, y } = piece;
-  const dx = direction === 'left' ? -1 : direction === 'right' ? 1 : 0;
-  const dy = direction === 'up'   ? -1 : direction === 'down'  ? 1 : 0;
-
-  while (true) {
-    const nx = x + dx;
-    const ny = y + dy;
-
-    // Boundary check
-    if (nx < 0 || nx >= gameState.cols || ny < 0 || ny >= gameState.rows) break;
-
-    // Collision with other pieces
-    const blocked = allPieces.some(p => p.x === nx && p.y === ny);
-    if (blocked) break;
-
-    x = nx;
-    y = ny;
+// ── Occupied cell check ────────────────────────────────────
+function isCellOccupied(x, y, excludeKey) {
+  // Check ball
+  if (excludeKey !== 'ball' && gameState.ball.x === x && gameState.ball.y === y) return true;
+  // Check blocks
+  for (let i = 0; i < gameState.blocks.length; i++) {
+    if (excludeKey === i) continue;
+    if (gameState.blocks[i].x === x && gameState.blocks[i].y === y) return true;
   }
-
-  return { x, y };
+  return false;
 }
 
-// Get all pieces as {x,y} array, excluding one by reference
-function getAllPiecesExcept(excludePiece) {
-  const pieces = [];
-  // Add ball (unless excluded)
-  if (excludePiece !== 'ball') {
-    pieces.push({ x: gameState.ball.x, y: gameState.ball.y });
-  }
-  // Add blocks (unless excluded)
-  gameState.blocks.forEach((b, i) => {
-    if (excludePiece !== i) {
-      pieces.push({ x: b.x, y: b.y });
+// ── Get valid moves in 4 cardinal directions ───────────────
+// Returns all empty cells reachable by walking straight in each
+// direction from the piece's position. Stops at walls/obstacles.
+function getValidMovesForPiece(piece, excludeKey) {
+  const moves = [];
+  const directions = [
+    { dx: 0, dy: -1 }, // up
+    { dx: 0, dy:  1 }, // down
+    { dx: -1, dy: 0 }, // left
+    { dx:  1, dy: 0 }, // right
+  ];
+
+  for (const { dx, dy } of directions) {
+    let cx = piece.x + dx;
+    let cy = piece.y + dy;
+
+    while (cx >= 0 && cx < gameState.cols && cy >= 0 && cy < gameState.rows) {
+      if (isCellOccupied(cx, cy, excludeKey)) break; // blocked
+      moves.push({ x: cx, y: cy });
+      cx += dx;
+      cy += dy;
     }
-  });
-  return pieces;
-}
-
-// ── Move Execution ─────────────────────────────────────────
-function performMove(direction) {
-  if (!gameActive || isAnimating) return;
-
-  // Determine which piece to move
-  let piece, pieceRef, excludeKey;
-
-  if (selectedPiece === null || selectedPiece === 'ball') {
-    // Move ball
-    piece = gameState.ball;
-    pieceRef = 'ball';
-    excludeKey = 'ball';
-  } else {
-    // Move selected block
-    const idx = selectedPiece;
-    const block = gameState.blocks[idx];
-    if (!block || block.fixed) return;
-    piece = block;
-    pieceRef = idx;
-    excludeKey = idx;
   }
 
-  const others = getAllPiecesExcept(excludeKey);
-  const target = getSlideTarget(piece, direction, others);
+  return moves;
+}
 
-  // No movement? ignore
-  if (target.x === piece.x && target.y === piece.y) return;
+// ── Move a piece to a target cell ──────────────────────────
+function movePieceTo(targetX, targetY) {
+  if (!gameActive || isAnimating) return;
+  if (selectedPiece === null) return;
+
+  // Verify target is in valid moves
+  const isValid = validMoves.some(m => m.x === targetX && m.y === targetY);
+  if (!isValid) return;
 
   // Save state for undo
   history.push({ state: cloneState(), moves: moves });
 
-  const distance = Math.abs(target.x - piece.x) + Math.abs(target.y - piece.y);
-  const duration = distance * SLIDE_SPEED;
-
-  // Create trail
-  createTrail(piece, target, direction, pieceRef === 'ball' ? 'ball' : gameState.blocks[pieceRef].color);
-
-  // Update position
-  piece.x = target.x;
-  piece.y = target.y;
-  moves++;
-  movesEl.textContent = moves;
+  // Get the piece reference
+  let piece;
+  if (selectedPiece === 'ball') {
+    piece = gameState.ball;
+  } else {
+    piece = gameState.blocks[selectedPiece];
+  }
 
   // Animate
   isAnimating = true;
+
+  // Update position
+  piece.x = targetX;
+  piece.y = targetY;
+  moves++;
+  movesEl.textContent = moves;
+
+  // Clear valid moves and re-render
+  validMoves = [];
   renderBoard();
 
   setTimeout(() => {
     isAnimating = false;
     // Check win after ball moves
-    if (pieceRef === 'ball') {
+    if (selectedPiece === 'ball') {
       checkWin();
     }
-  }, duration + 50);
+    // Keep the same piece selected for convenience
+    if (gameActive && selectedPiece !== null) {
+      computeValidMoves();
+      renderBoard();
+    }
+  }, MOVE_DURATION + 50);
 }
 
-// ── Trail Effect ───────────────────────────────────────────
-function createTrail(from, to, direction, colorClass) {
-  const cp = cellPx();
-  const gap = 4;
-  const dx = direction === 'left' ? -1 : direction === 'right' ? 1 : 0;
-  const dy = direction === 'up'   ? -1 : direction === 'down'  ? 1 : 0;
-
-  let cx = from.x, cy = from.y;
-  let delay = 0;
-
-  while (cx !== to.x || cy !== to.y) {
-    const trail = document.createElement('div');
-    trail.className = 'trail-dot';
-
-    const trailColor = colorClass === 'ball' ? 'rgba(239,83,80,0.4)' :
-      colorClass === 'blue'   ? 'rgba(66,133,244,0.3)' :
-      colorClass === 'orange' ? 'rgba(255,167,38,0.3)' :
-      colorClass === 'teal'   ? 'rgba(38,198,218,0.3)' :
-      colorClass === 'purple' ? 'rgba(171,71,188,0.3)' :
-      colorClass === 'yellow' ? 'rgba(251,188,4,0.3)' :
-      colorClass === 'green'  ? 'rgba(102,187,106,0.3)' :
-      'rgba(150,150,150,0.3)';
-
-    trail.style.left   = (cx * cp + gap / 2) + 'px';
-    trail.style.top    = (cy * cp + gap / 2) + 'px';
-    trail.style.width  = (cp - gap) + 'px';
-    trail.style.height = (cp - gap) + 'px';
-    trail.style.background = trailColor;
-    trail.style.animationDelay = delay + 'ms';
-
-    boardEl.appendChild(trail);
-
-    cx += dx;
-    cy += dy;
-    delay += 30;
+// ── Compute valid moves for currently selected piece ───────
+function computeValidMoves() {
+  if (selectedPiece === null) {
+    validMoves = [];
+    return;
   }
 
-  // Clean up trails
-  setTimeout(() => {
-    boardEl.querySelectorAll('.trail-dot').forEach(t => t.remove());
-  }, delay + 600);
+  let piece, excludeKey;
+  if (selectedPiece === 'ball') {
+    piece = gameState.ball;
+    excludeKey = 'ball';
+  } else {
+    const block = gameState.blocks[selectedPiece];
+    if (!block || block.fixed) {
+      validMoves = [];
+      return;
+    }
+    piece = block;
+    excludeKey = selectedPiece;
+  }
+
+  validMoves = getValidMovesForPiece(piece, excludeKey);
 }
 
 // ── Render ─────────────────────────────────────────────────
 function renderBoard() {
-  // Remove everything except trails
-  const trails = boardEl.querySelectorAll('.trail-dot');
   boardEl.innerHTML = '';
-  trails.forEach(t => boardEl.appendChild(t));
 
   updateBoardSize();
   const cp = cellPx();
@@ -577,6 +541,23 @@ function renderBoard() {
       boardEl.appendChild(cell);
     }
   }
+
+  // Valid move highlights
+  validMoves.forEach(m => {
+    const highlight = document.createElement('div');
+    highlight.className = 'valid-move';
+    highlight.style.left   = (m.x * cp + gap / 2) + 'px';
+    highlight.style.top    = (m.y * cp + gap / 2) + 'px';
+    highlight.style.width  = (cp - gap) + 'px';
+    highlight.style.height = (cp - gap) + 'px';
+
+    highlight.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      movePieceTo(m.x, m.y);
+    });
+
+    boardEl.appendChild(highlight);
+  });
 
   // Hole
   const h = gameState.hole;
@@ -618,7 +599,7 @@ function renderBoard() {
   // Ball
   const ballEl = document.createElement('div');
   ballEl.className = 'block ball-piece';
-  if (selectedPiece === null || selectedPiece === 'ball') ballEl.classList.add('selected');
+  if (selectedPiece === 'ball') ballEl.classList.add('selected');
 
   ballEl.style.left   = (gameState.ball.x * cp + gap / 2) + 'px';
   ballEl.style.top    = (gameState.ball.y * cp + gap / 2) + 'px';
@@ -633,10 +614,11 @@ function renderBoard() {
 
   boardEl.appendChild(ballEl);
 
-  // Deselect when clicking background
+  // Deselect when clicking empty background
   boardEl.addEventListener('pointerdown', (e) => {
     if (e.target === boardEl || e.target.classList.contains('grid-cell')) {
-      selectedPiece = 'ball'; // default back to ball
+      selectedPiece = null;
+      validMoves = [];
       renderBoard();
     }
   });
@@ -646,10 +628,14 @@ function renderBoard() {
 }
 
 function selectPiece(ref) {
+  if (isAnimating) return;
   if (selectedPiece === ref) {
-    selectedPiece = 'ball'; // toggle: deselect → select ball
+    // Deselect
+    selectedPiece = null;
+    validMoves = [];
   } else {
     selectedPiece = ref;
+    computeValidMoves();
   }
   renderBoard();
 }
@@ -659,12 +645,14 @@ function updateInstruction() {
     instructionEl.textContent = '🎉 Level Complete!';
     return;
   }
-  if (selectedPiece === null || selectedPiece === 'ball') {
-    instructionEl.textContent = 'Swipe or use arrows to slide the ball. Tap a block to select it.';
+  if (selectedPiece === null) {
+    instructionEl.textContent = 'Tap the ball or a movable block to select it.';
+  } else if (selectedPiece === 'ball') {
+    instructionEl.textContent = 'Ball selected. Tap a highlighted cell to move it there.';
   } else {
     const block = gameState.blocks[selectedPiece];
     if (block) {
-      instructionEl.textContent = `Selected ${block.color} block. Use arrows to slide it, or tap ball to switch.`;
+      instructionEl.textContent = `Selected ${block.color} block. Tap a highlighted cell to move it.`;
     }
   }
 }
@@ -674,6 +662,7 @@ function checkWin() {
   if (gameState.ball.x === gameState.hole.x && gameState.ball.y === gameState.hole.y) {
     gameActive = false;
     selectedPiece = null;
+    validMoves = [];
     nextBtn.disabled = false;
 
     saveBestScore(currentLevel, moves);
@@ -735,7 +724,8 @@ function undo() {
   gameState.blocks = prev.state.blocks;
   moves = prev.moves;
   movesEl.textContent = moves;
-  selectedPiece = 'ball';
+  selectedPiece = null;
+  validMoves = [];
   renderBoard();
 }
 
@@ -753,7 +743,8 @@ function resetLevel() {
   movesEl.textContent = 0;
   minMovesEl.textContent = lvl.minMoves;
   history = [];
-  selectedPiece = 'ball';
+  selectedPiece = null;
+  validMoves = [];
   gameActive = true;
   isAnimating = false;
   nextBtn.disabled = true;
@@ -810,53 +801,9 @@ function showLevelSelect() {
   levelModal.classList.remove('hidden');
 }
 
-// ── Input: Keyboard ────────────────────────────────────────
+// ── Input: Keyboard (Ctrl+Z for undo) ──────────────────────
 window.addEventListener('keydown', (e) => {
   if (e.key === 'z' && e.ctrlKey) { undo(); return; }
-
-  const directionMap = {
-    'ArrowUp': 'up', 'ArrowDown': 'down', 'ArrowLeft': 'left', 'ArrowRight': 'right',
-    'w': 'up', 's': 'down', 'a': 'left', 'd': 'right',
-    'W': 'up', 'S': 'down', 'A': 'left', 'D': 'right',
-  };
-
-  const dir = directionMap[e.key];
-  if (dir) {
-    e.preventDefault();
-    performMove(dir);
-  }
-});
-
-// ── Input: D-Pad Buttons ───────────────────────────────────
-dpadUp.addEventListener('click',    () => performMove('up'));
-dpadDown.addEventListener('click',  () => performMove('down'));
-dpadLeft.addEventListener('click',  () => performMove('left'));
-dpadRight.addEventListener('click', () => performMove('right'));
-
-// ── Input: Touch Swipe Detection ───────────────────────────
-let touchStartX = 0, touchStartY = 0;
-
-boardEl.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 1) {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-  }
-}, { passive: true });
-
-boardEl.addEventListener('touchend', (e) => {
-  if (!gameActive || isAnimating) return;
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  const dy = e.changedTouches[0].clientY - touchStartY;
-  const absDx = Math.abs(dx);
-  const absDy = Math.abs(dy);
-
-  if (Math.max(absDx, absDy) < 30) return; // too small
-
-  if (absDx > absDy) {
-    performMove(dx > 0 ? 'right' : 'left');
-  } else {
-    performMove(dy > 0 ? 'down' : 'up');
-  }
 });
 
 // ── Event Bindings ─────────────────────────────────────────
