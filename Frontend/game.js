@@ -17,329 +17,603 @@ const MOVE_DURATION = 200; // ms for move animation
 // minMoves: stated optimal solution length.
 
 const LEVELS = [
-  // ─── Level 1: "First Slide" ── min 1 ─────────────────────
+  // ─── Level 1: "The Long Block" ── min 2 ────────────────────
   {
-    name: "First Slide",
+    name: "The Long Block",
     cols: 6, rows: 6,
     ball: { x: 0, y: 3 },
     hole: { x: 5, y: 3 },
     blocks: [
-      { id: 'a', x: 2, y: 1, color: 'blue',   fixed: true },
-      { id: 'b', x: 4, y: 5, color: 'yellow',  fixed: true },
+      { id: 'a', x: 2, y: 1, w: 1, h: 3, color: 'blue', fixed: false },
+      { id: 'b', x: 4, y: 0, w: 1, h: 2, color: 'teal', fixed: true },
     ],
-    minMoves: 1,
+    minMoves: 3,
   },
-  // ─── Level 2: "Corner Turn" ── min 2 ─────────────────────
+  // ─── Level 2: "Wide Obstacle" ── min 3 ─────────────────────
   {
-    name: "Corner Turn",
+    name: "Wide Obstacle",
     cols: 6, rows: 6,
     ball: { x: 0, y: 0 },
     hole: { x: 5, y: 5 },
     blocks: [
-      { id: 'a', x: 0, y: 3, color: 'teal',   fixed: true },
-      { id: 'b', x: 3, y: 2, color: 'blue',   fixed: true },
+      { id: 'a', x: 0, y: 3, w: 3, h: 1, color: 'teal', fixed: false },
+      { id: 'b', x: 3, y: 2, w: 2, h: 1, color: 'blue', fixed: true },
     ],
-    minMoves: 2,
+    minMoves: 4,
   },
-  // ─── Level 3: "Clear the Way" ── min 2 ───────────────────
+  // ─── Level 3: "Sliding Doors" ── min 4 ───────────────────
   {
-    name: "Clear the Way",
+    name: "Sliding Doors",
     cols: 6, rows: 6,
-    ball: { x: 3, y: 0 },
-    hole: { x: 5, y: 0 },
+    ball: { x: 2, y: 0 },
+    hole: { x: 2, y: 5 },
     blocks: [
-      { id: 'a', x: 4, y: 0, color: 'orange', fixed: false },
-      { id: 'b', x: 1, y: 3, color: 'blue',   fixed: true },
-      { id: 'c', x: 4, y: 4, color: 'teal',   fixed: true },
+      { id: 'a', x: 0, y: 2, w: 4, h: 1, color: 'orange', fixed: false },
+      { id: 'b', x: 2, y: 4, w: 3, h: 1, color: 'blue', fixed: false },
+      { id: 'c', x: 5, y: 1, w: 1, h: 4, color: 'teal', fixed: true },
     ],
-    minMoves: 2,
+    minMoves: 5,
   },
-  // ─── Level 4: "The L-Shape" ── min 3 ─────────────────────
+  // ─── Level 4: "Traffic Jam" ── min 5 ─────────────────────
   {
-    name: "The L-Shape",
+    name: "Traffic Jam",
     cols: 6, rows: 6,
-    ball: { x: 0, y: 0 },
-    hole: { x: 0, y: 5 },
+    ball: { x: 0, y: 2 },
+    hole: { x: 5, y: 2 },
     blocks: [
-      { id: 'a', x: 0, y: 2, color: 'purple', fixed: true },
-      { id: 'b', x: 3, y: 3, color: 'blue',   fixed: true },
+      { id: 'a', x: 3, y: 0, w: 1, h: 3, color: 'purple', fixed: false },
+      { id: 'b', x: 4, y: 4, w: 2, h: 1, color: 'yellow', fixed: false },
+      { id: 'c', x: 1, y: 4, w: 1, h: 2, color: 'blue', fixed: true },
     ],
-    minMoves: 3,
+    minMoves: 5,
   },
-  // ─── Level 5: "First Obstacle" ── min 3 ──────────────────
+  // ─── Level 5: "The H-Bridge" ── min 5 ──────────────────
   {
-    name: "First Obstacle",
-    cols: 6, rows: 6,
-    ball: { x: 5, y: 5 },
-    hole: { x: 0, y: 0 },
-    blocks: [
-      { id: 'a', x: 0, y: 3, color: 'teal',   fixed: true },
-      { id: 'b', x: 2, y: 0, color: 'orange', fixed: false },
-      { id: 'c', x: 3, y: 4, color: 'blue',   fixed: true },
-    ],
-    minMoves: 3,
-  },
-  // ─── Level 6: "Zigzag" ── min 4 ──────────────────────────
-  {
-    name: "Zigzag",
+    name: "The H-Bridge",
     cols: 6, rows: 6,
     ball: { x: 0, y: 5 },
     hole: { x: 5, y: 0 },
     blocks: [
-      { id: 'a', x: 0, y: 2, color: 'blue',   fixed: true },
-      { id: 'b', x: 3, y: 5, color: 'orange', fixed: true },
-      { id: 'c', x: 5, y: 3, color: 'teal',   fixed: true },
+      { id: 'a', x: 2, y: 0, w: 1, h: 4, color: 'teal', fixed: false },
+      { id: 'b', x: 4, y: 2, w: 1, h: 4, color: 'orange', fixed: false },
+      { id: 'c', x: 3, y: 2, w: 1, h: 1, color: 'blue', fixed: true },
     ],
-    minMoves: 4,
+    minMoves: 6,
   },
-  // ─── Level 7: "Blockade" ── min 4 ────────────────────────
+  // ─── Level 6: "Boxed In" ── min 6 ──────────────────────────
   {
-    name: "Blockade",
+    name: "Boxed In",
+    cols: 6, rows: 6,
+    ball: { x: 2, y: 2 },
+    hole: { x: 5, y: 5 },
+    blocks: [
+      { id: 'a', x: 1, y: 1, w: 4, h: 1, color: 'blue', fixed: false },
+      { id: 'b', x: 1, y: 4, w: 4, h: 1, color: 'orange', fixed: false },
+      { id: 'c', x: 1, y: 2, w: 1, h: 2, color: 'teal', fixed: false },
+      { id: 'd', x: 4, y: 2, w: 1, h: 2, color: 'purple', fixed: false },
+    ],
+    minMoves: 7,
+  },
+  // ─── Level 7: "Shift to Open" ── min 6 ────────────────────────
+  {
+    name: "Shift to Open",
     cols: 6, rows: 6,
     ball: { x: 0, y: 0 },
     hole: { x: 5, y: 5 },
     blocks: [
-      { id: 'a', x: 3, y: 0, color: 'orange', fixed: false },
-      { id: 'b', x: 5, y: 3, color: 'purple', fixed: false },
-      { id: 'c', x: 0, y: 4, color: 'blue',   fixed: true },
-      { id: 'd', x: 2, y: 2, color: 'teal',   fixed: true },
+      { id: 'a', x: 2, y: 0, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'b', x: 4, y: 2, w: 1, h: 2, color: 'purple', fixed: false },
+      { id: 'c', x: 0, y: 2, w: 2, h: 1, color: 'blue', fixed: true },
+      { id: 'd', x: 2, y: 3, w: 1, h: 3, color: 'teal', fixed: false },
     ],
-    minMoves: 4,
+    minMoves: 7,
   },
-  // ─── Level 8: "Corridors" ── min 5 ───────────────────────
+  // ─── Level 8: "The T-Junction" ── min 7 ───────────────────────
   {
-    name: "Corridors",
+    name: "The T-Junction",
     cols: 6, rows: 6,
     ball: { x: 0, y: 0 },
     hole: { x: 5, y: 5 },
     blocks: [
-      { id: 'a', x: 0, y: 2, color: 'blue',   fixed: true },
-      { id: 'b', x: 2, y: 0, color: 'orange', fixed: false },
-      { id: 'c', x: 3, y: 3, color: 'teal',   fixed: true },
-      { id: 'd', x: 5, y: 1, color: 'yellow',  fixed: true },
-      { id: 'e', x: 4, y: 5, color: 'purple', fixed: false },
+      { id: 'a', x: 1, y: 0, w: 1, h: 3, color: 'blue', fixed: false },
+      { id: 'b', x: 0, y: 4, w: 3, h: 1, color: 'orange', fixed: false },
+      { id: 'c', x: 3, y: 2, w: 3, h: 1, color: 'teal', fixed: true },
+      { id: 'd', x: 4, y: 4, w: 2, h: 2, color: 'yellow', fixed: false },
     ],
-    minMoves: 5,
+    minMoves: 8,
   },
-  // ─── Level 9: "Tight Squeeze" ── min 5 ───────────────────
+  // ─── Level 9: "Crossroads" ── min 8 ───────────────────
   {
-    name: "Tight Squeeze",
+    name: "Crossroads",
     cols: 6, rows: 6,
     ball: { x: 5, y: 0 },
     hole: { x: 0, y: 5 },
     blocks: [
-      { id: 'a', x: 2, y: 0, color: 'orange', fixed: false },
-      { id: 'b', x: 5, y: 3, color: 'blue',   fixed: true },
-      { id: 'c', x: 0, y: 2, color: 'teal',   fixed: true },
-      { id: 'd', x: 3, y: 5, color: 'purple', fixed: false },
-      { id: 'e', x: 1, y: 4, color: 'yellow',  fixed: true },
-    ],
-    minMoves: 5,
-  },
-  // ─── Level 10: "The Maze Begins" ── min 6 ────────────────
-  {
-    name: "The Maze Begins",
-    cols: 6, rows: 6,
-    ball: { x: 0, y: 0 },
-    hole: { x: 5, y: 5 },
-    blocks: [
-      { id: 'a', x: 0, y: 2, color: 'blue',   fixed: true },
-      { id: 'b', x: 2, y: 0, color: 'orange', fixed: true },
-      { id: 'c', x: 3, y: 2, color: 'teal',   fixed: false },
-      { id: 'd', x: 5, y: 3, color: 'yellow',  fixed: true },
-      { id: 'e', x: 2, y: 4, color: 'purple', fixed: false },
-      { id: 'f', x: 4, y: 1, color: 'green',  fixed: true },
-    ],
-    minMoves: 6,
-  },
-  // ─── Level 11: "Moving Walls" ── min 6 ───────────────────
-  {
-    name: "Moving Walls",
-    cols: 6, rows: 6,
-    ball: { x: 5, y: 5 },
-    hole: { x: 0, y: 0 },
-    blocks: [
-      { id: 'a', x: 2, y: 5, color: 'orange', fixed: false },
-      { id: 'b', x: 5, y: 2, color: 'blue',   fixed: true },
-      { id: 'c', x: 0, y: 3, color: 'teal',   fixed: true },
-      { id: 'd', x: 3, y: 0, color: 'purple', fixed: false },
-      { id: 'e', x: 1, y: 1, color: 'yellow',  fixed: true },
-      { id: 'f', x: 4, y: 3, color: 'green',  fixed: false },
-    ],
-    minMoves: 6,
-  },
-  // ─── Level 12: "Spiral In" ── min 7 ──────────────────────
-  {
-    name: "Spiral In",
-    cols: 6, rows: 6,
-    ball: { x: 0, y: 0 },
-    hole: { x: 3, y: 3 },
-    blocks: [
-      { id: 'a', x: 4, y: 0, color: 'blue',   fixed: true },
-      { id: 'b', x: 5, y: 4, color: 'teal',   fixed: true },
-      { id: 'c', x: 1, y: 5, color: 'orange', fixed: true },
-      { id: 'd', x: 0, y: 2, color: 'purple', fixed: true },
-      { id: 'e', x: 3, y: 2, color: 'yellow',  fixed: false },
-      { id: 'f', x: 2, y: 4, color: 'green',  fixed: false },
-      { id: 'g', x: 4, y: 3, color: 'orange', fixed: false },
-    ],
-    minMoves: 7,
-  },
-  // ─── Level 13: "Double Block" ── min 7 ───────────────────
-  {
-    name: "Double Block",
-    cols: 6, rows: 6,
-    ball: { x: 0, y: 5 },
-    hole: { x: 5, y: 0 },
-    blocks: [
-      { id: 'a', x: 0, y: 2, color: 'blue',   fixed: true },
-      { id: 'b', x: 3, y: 0, color: 'orange', fixed: false },
-      { id: 'c', x: 5, y: 2, color: 'teal',   fixed: true },
-      { id: 'd', x: 2, y: 3, color: 'purple', fixed: false },
-      { id: 'e', x: 4, y: 5, color: 'yellow',  fixed: true },
-      { id: 'f', x: 1, y: 1, color: 'green',  fixed: false },
-      { id: 'g', x: 3, y: 4, color: 'orange', fixed: true },
-    ],
-    minMoves: 7,
-  },
-  // ─── Level 14: "Narrow Path" ── min 8 ────────────────────
-  {
-    name: "Narrow Path",
-    cols: 6, rows: 6,
-    ball: { x: 0, y: 0 },
-    hole: { x: 0, y: 5 },
-    blocks: [
-      { id: 'a', x: 0, y: 1, color: 'blue',   fixed: true },
-      { id: 'b', x: 2, y: 0, color: 'orange', fixed: true },
-      { id: 'c', x: 3, y: 2, color: 'teal',   fixed: false },
-      { id: 'd', x: 5, y: 1, color: 'purple', fixed: true },
-      { id: 'e', x: 4, y: 4, color: 'yellow',  fixed: false },
-      { id: 'f', x: 1, y: 3, color: 'green',  fixed: true },
-      { id: 'g', x: 2, y: 5, color: 'orange', fixed: false },
-      { id: 'h', x: 5, y: 5, color: 'teal',   fixed: true },
-    ],
-    minMoves: 8,
-  },
-  // ─── Level 15: "The Gauntlet" ── min 8 ───────────────────
-  {
-    name: "The Gauntlet",
-    cols: 6, rows: 6,
-    ball: { x: 5, y: 0 },
-    hole: { x: 0, y: 5 },
-    blocks: [
-      { id: 'a', x: 2, y: 0, color: 'blue',   fixed: true },
-      { id: 'b', x: 5, y: 3, color: 'orange', fixed: true },
-      { id: 'c', x: 0, y: 1, color: 'teal',   fixed: true },
-      { id: 'd', x: 3, y: 2, color: 'purple', fixed: false },
-      { id: 'e', x: 1, y: 4, color: 'yellow',  fixed: false },
-      { id: 'f', x: 4, y: 5, color: 'green',  fixed: false },
-      { id: 'g', x: 2, y: 3, color: 'orange', fixed: true },
-      { id: 'h', x: 4, y: 1, color: 'teal',   fixed: false },
-    ],
-    minMoves: 8,
-  },
-  // ─── Level 16: "Interlock" ── min 9 ──────────────────────
-  {
-    name: "Interlock",
-    cols: 6, rows: 6,
-    ball: { x: 0, y: 0 },
-    hole: { x: 5, y: 5 },
-    blocks: [
-      { id: 'a', x: 1, y: 0, color: 'blue',   fixed: true },
-      { id: 'b', x: 0, y: 2, color: 'teal',   fixed: true },
-      { id: 'c', x: 3, y: 1, color: 'orange', fixed: false },
-      { id: 'd', x: 5, y: 2, color: 'purple', fixed: true },
-      { id: 'e', x: 2, y: 3, color: 'yellow',  fixed: false },
-      { id: 'f', x: 4, y: 4, color: 'green',  fixed: false },
-      { id: 'g', x: 1, y: 5, color: 'orange', fixed: true },
-      { id: 'h', x: 3, y: 4, color: 'teal',   fixed: true },
-      { id: 'i', x: 5, y: 0, color: 'purple', fixed: false },
+      { id: 'a', x: 2, y: 1, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'b', x: 4, y: 2, w: 1, h: 3, color: 'blue', fixed: true },
+      { id: 'c', x: 1, y: 2, w: 1, h: 3, color: 'teal', fixed: false },
+      { id: 'd', x: 2, y: 4, w: 2, h: 1, color: 'purple', fixed: false },
+      { id: 'e', x: 0, y: 1, w: 2, h: 1, color: 'yellow', fixed: true },
     ],
     minMoves: 9,
   },
-  // ─── Level 17: "Chain Reaction" ── min 10 ────────────────
+  // ─── Level 10: "Heavy Cargo" ── min 8 ────────────────
   {
-    name: "Chain Reaction",
+    name: "Heavy Cargo",
+    cols: 6, rows: 6,
+    ball: { x: 0, y: 0 },
+    hole: { x: 5, y: 5 },
+    blocks: [
+      { id: 'a', x: 2, y: 0, w: 2, h: 2, color: 'blue', fixed: false },
+      { id: 'b', x: 0, y: 2, w: 2, h: 1, color: 'orange', fixed: true },
+      { id: 'c', x: 3, y: 3, w: 1, h: 3, color: 'teal', fixed: false },
+      { id: 'd', x: 4, y: 1, w: 2, h: 1, color: 'yellow', fixed: true },
+      { id: 'e', x: 1, y: 4, w: 2, h: 1, color: 'purple', fixed: false },
+    ],
+    minMoves: 10,
+  },
+  // ─── Level 11: "The Winding Path" ── min 9 ───────────────────
+  {
+    name: "The Winding Path",
     cols: 6, rows: 6,
     ball: { x: 5, y: 5 },
     hole: { x: 0, y: 0 },
     blocks: [
-      { id: 'a', x: 3, y: 5, color: 'blue',   fixed: true },
-      { id: 'b', x: 5, y: 2, color: 'teal',   fixed: true },
-      { id: 'c', x: 0, y: 4, color: 'orange', fixed: true },
-      { id: 'd', x: 2, y: 1, color: 'purple', fixed: false },
-      { id: 'e', x: 4, y: 3, color: 'yellow',  fixed: false },
-      { id: 'f', x: 1, y: 0, color: 'green',  fixed: false },
-      { id: 'g', x: 3, y: 2, color: 'orange', fixed: false },
-      { id: 'h', x: 0, y: 2, color: 'blue',   fixed: true },
-      { id: 'i', x: 1, y: 3, color: 'teal',   fixed: false },
+      { id: 'a', x: 1, y: 4, w: 3, h: 1, color: 'orange', fixed: false },
+      { id: 'b', x: 4, y: 1, w: 1, h: 3, color: 'blue', fixed: true },
+      { id: 'c', x: 0, y: 2, w: 2, h: 1, color: 'teal', fixed: true },
+      { id: 'd', x: 2, y: 0, w: 1, h: 2, color: 'purple', fixed: false },
+      { id: 'e', x: 1, y: 1, w: 1, h: 1, color: 'yellow', fixed: true },
+      { id: 'f', x: 3, y: 2, w: 1, h: 2, color: 'green', fixed: false },
     ],
     minMoves: 10,
   },
-  // ─── Level 18: "The Labyrinth" ── min 10 ─────────────────
+  // ─── Level 12: "Barricades" ── min 10 ──────────────────────
   {
-    name: "The Labyrinth",
+    name: "Barricades",
     cols: 6, rows: 6,
     ball: { x: 0, y: 0 },
     hole: { x: 5, y: 5 },
     blocks: [
-      { id: 'a', x: 1, y: 1, color: 'blue',   fixed: true },
-      { id: 'b', x: 3, y: 0, color: 'teal',   fixed: true },
-      { id: 'c', x: 5, y: 1, color: 'orange', fixed: true },
-      { id: 'd', x: 0, y: 3, color: 'purple', fixed: true },
-      { id: 'e', x: 2, y: 2, color: 'yellow',  fixed: false },
-      { id: 'f', x: 4, y: 3, color: 'green',  fixed: false },
-      { id: 'g', x: 1, y: 4, color: 'orange', fixed: false },
-      { id: 'h', x: 3, y: 5, color: 'teal',   fixed: false },
-      { id: 'i', x: 5, y: 4, color: 'blue',   fixed: true },
-      { id: 'j', x: 2, y: 5, color: 'purple', fixed: false },
+      { id: 'a', x: 2, y: 0, w: 1, h: 3, color: 'blue', fixed: true },
+      { id: 'b', x: 4, y: 3, w: 2, h: 1, color: 'teal', fixed: false },
+      { id: 'c', x: 0, y: 4, w: 3, h: 1, color: 'orange', fixed: true },
+      { id: 'd', x: 0, y: 2, w: 2, h: 1, color: 'purple', fixed: false },
+      { id: 'e', x: 3, y: 1, w: 2, h: 1, color: 'yellow', fixed: false },
+      { id: 'f', x: 3, y: 4, w: 1, h: 2, color: 'green', fixed: false },
     ],
-    minMoves: 10,
+    minMoves: 12,
   },
-  // ─── Level 19: "Near Impossible" ── min 11 ───────────────
+  // ─── Level 13: "Gridlock" ── min 11 ───────────────────
   {
-    name: "Near Impossible",
+    name: "Gridlock",
+    cols: 6, rows: 6,
+    ball: { x: 0, y: 5 },
+    hole: { x: 5, y: 0 },
+    blocks: [
+      { id: 'a', x: 0, y: 2, w: 2, h: 1, color: 'blue', fixed: false },
+      { id: 'b', x: 3, y: 0, w: 1, h: 3, color: 'orange', fixed: false },
+      { id: 'c', x: 4, y: 2, w: 2, h: 1, color: 'teal', fixed: true },
+      { id: 'd', x: 2, y: 3, w: 2, h: 1, color: 'purple', fixed: false },
+      { id: 'e', x: 4, y: 4, w: 2, h: 2, color: 'yellow', fixed: true },
+      { id: 'f', x: 1, y: 1, w: 1, h: 2, color: 'green', fixed: false },
+    ],
+    minMoves: 13,
+  },
+  // ─── Level 14: "Corridor Squeeze" ── min 12 ────────────────────
+  {
+    name: "Corridor Squeeze",
+    cols: 6, rows: 6,
+    ball: { x: 0, y: 1 },
+    hole: { x: 5, y: 4 },
+    blocks: [
+      { id: 'a', x: 1, y: 0, w: 1, h: 3, color: 'blue', fixed: true },
+      { id: 'b', x: 2, y: 2, w: 3, h: 1, color: 'orange', fixed: false },
+      { id: 'c', x: 3, y: 3, w: 1, h: 2, color: 'teal', fixed: false },
+      { id: 'd', x: 4, y: 0, w: 2, h: 1, color: 'purple', fixed: true },
+      { id: 'e', x: 4, y: 4, w: 2, h: 1, color: 'yellow', fixed: false },
+      { id: 'f', x: 0, y: 3, w: 2, h: 1, color: 'green', fixed: true },
+      { id: 'g', x: 2, y: 4, w: 1, h: 2, color: 'orange', fixed: false },
+    ],
+    minMoves: 14,
+  },
+  // ─── Level 15: "Sliding Madness" ── min 13 ───────────────────
+  {
+    name: "Sliding Madness",
     cols: 6, rows: 6,
     ball: { x: 5, y: 0 },
     hole: { x: 0, y: 5 },
     blocks: [
-      { id: 'a', x: 2, y: 0, color: 'blue',   fixed: true },
-      { id: 'b', x: 4, y: 1, color: 'teal',   fixed: true },
-      { id: 'c', x: 0, y: 1, color: 'orange', fixed: true },
-      { id: 'd', x: 1, y: 3, color: 'purple', fixed: false },
-      { id: 'e', x: 3, y: 2, color: 'yellow',  fixed: false },
-      { id: 'f', x: 5, y: 4, color: 'green',  fixed: false },
-      { id: 'g', x: 2, y: 5, color: 'orange', fixed: false },
-      { id: 'h', x: 0, y: 4, color: 'blue',   fixed: true },
-      { id: 'i', x: 4, y: 3, color: 'teal',   fixed: true },
-      { id: 'j', x: 3, y: 5, color: 'purple', fixed: false },
-      { id: 'k', x: 1, y: 2, color: 'green',  fixed: false },
+      { id: 'a', x: 2, y: 0, w: 1, h: 2, color: 'blue', fixed: true },
+      { id: 'b', x: 4, y: 1, w: 2, h: 1, color: 'orange', fixed: true },
+      { id: 'c', x: 0, y: 1, w: 2, h: 1, color: 'teal', fixed: false },
+      { id: 'd', x: 3, y: 2, w: 2, h: 1, color: 'purple', fixed: false },
+      { id: 'e', x: 1, y: 3, w: 1, h: 2, color: 'yellow', fixed: false },
+      { id: 'f', x: 4, y: 4, w: 2, h: 1, color: 'green', fixed: false },
+      { id: 'g', x: 2, y: 3, w: 2, h: 1, color: 'orange', fixed: true },
+      { id: 'h', x: 4, y: 2, w: 1, h: 2, color: 'teal', fixed: false },
     ],
-    minMoves: 11,
+    minMoves: 15,
   },
-  // ─── Level 20: "The Final Test" ── min 12 ────────────────
+  // ─── Level 16: "Interlock Complex" ── min 14 ──────────────────────
   {
-    name: "The Final Test",
+    name: "Interlock Complex",
     cols: 6, rows: 6,
     ball: { x: 0, y: 0 },
     hole: { x: 5, y: 5 },
     blocks: [
-      { id: 'a', x: 1, y: 0, color: 'blue',   fixed: true },
-      { id: 'b', x: 0, y: 2, color: 'teal',   fixed: true },
-      { id: 'c', x: 3, y: 1, color: 'orange', fixed: false },
-      { id: 'd', x: 5, y: 1, color: 'purple', fixed: true },
-      { id: 'e', x: 2, y: 3, color: 'yellow',  fixed: false },
-      { id: 'f', x: 4, y: 2, color: 'green',  fixed: false },
-      { id: 'g', x: 1, y: 4, color: 'orange', fixed: false },
-      { id: 'h', x: 3, y: 5, color: 'teal',   fixed: true },
-      { id: 'i', x: 5, y: 3, color: 'blue',   fixed: true },
-      { id: 'j', x: 0, y: 5, color: 'purple', fixed: false },
-      { id: 'k', x: 4, y: 4, color: 'green',  fixed: false },
-      { id: 'l', x: 2, y: 1, color: 'yellow',  fixed: true },
+      { id: 'a', x: 1, y: 0, w: 2, h: 1, color: 'blue', fixed: true },
+      { id: 'b', x: 0, y: 2, w: 1, h: 2, color: 'teal', fixed: true },
+      { id: 'c', x: 3, y: 1, w: 1, h: 3, color: 'orange', fixed: false },
+      { id: 'd', x: 4, y: 2, w: 2, h: 1, color: 'purple', fixed: false },
+      { id: 'e', x: 2, y: 3, w: 2, h: 1, color: 'yellow', fixed: false },
+      { id: 'f', x: 4, y: 4, w: 2, h: 1, color: 'green', fixed: false },
+      { id: 'g', x: 1, y: 5, w: 2, h: 1, color: 'orange', fixed: true },
+      { id: 'i', x: 5, y: 0, w: 1, h: 2, color: 'purple', fixed: false },
     ],
-    minMoves: 12,
+    minMoves: 16,
   },
+  // ─── Level 17: "The Vault" ── min 15 ────────────────
+  {
+    name: "The Vault",
+    cols: 6, rows: 6,
+    ball: { x: 5, y: 5 },
+    hole: { x: 0, y: 0 },
+    blocks: [
+      { id: 'a', x: 3, y: 4, w: 2, h: 1, color: 'blue', fixed: true },
+      { id: 'b', x: 4, y: 2, w: 1, h: 2, color: 'teal', fixed: false },
+      { id: 'c', x: 0, y: 4, w: 2, h: 1, color: 'orange', fixed: true },
+      { id: 'd', x: 2, y: 1, w: 1, h: 3, color: 'purple', fixed: false },
+      { id: 'e', x: 3, y: 2, w: 1, h: 2, color: 'yellow', fixed: false },
+      { id: 'f', x: 1, y: 0, w: 2, h: 1, color: 'green', fixed: false },
+      { id: 'g', x: 3, y: 0, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'h', x: 0, y: 2, w: 1, h: 2, color: 'blue', fixed: true },
+    ],
+    minMoves: 17,
+  },
+  // ─── Level 18: "Fortress" ── min 16 ─────────────────
+  {
+    name: "Fortress",
+    cols: 6, rows: 6,
+    ball: { x: 0, y: 0 },
+    hole: { x: 5, y: 5 },
+    blocks: [
+      { id: 'a', x: 1, y: 1, w: 1, h: 2, color: 'blue', fixed: true },
+      { id: 'b', x: 3, y: 0, w: 2, h: 1, color: 'teal', fixed: true },
+      { id: 'c', x: 5, y: 1, w: 1, h: 2, color: 'orange', fixed: false },
+      { id: 'd', x: 0, y: 3, w: 2, h: 1, color: 'purple', fixed: true },
+      { id: 'e', x: 2, y: 2, w: 2, h: 2, color: 'yellow', fixed: false },
+      { id: 'f', x: 4, y: 3, w: 2, h: 1, color: 'green', fixed: false },
+      { id: 'g', x: 1, y: 4, w: 1, h: 2, color: 'orange', fixed: false },
+      { id: 'h', x: 3, y: 5, w: 2, h: 1, color: 'teal', fixed: false },
+    ],
+    minMoves: 18,
+  },
+  // ─── Level 19: "Master's Trial" ── min 18 ───────────────
+  {
+    name: "Master's Trial",
+    cols: 6, rows: 6,
+    ball: { x: 5, y: 0 },
+    hole: { x: 0, y: 5 },
+    blocks: [
+      { id: 'a', x: 2, y: 0, w: 1, h: 2, color: 'blue', fixed: true },
+      { id: 'b', x: 4, y: 1, w: 2, h: 1, color: 'teal', fixed: true },
+      { id: 'c', x: 0, y: 1, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'd', x: 1, y: 2, w: 1, h: 3, color: 'purple', fixed: false },
+      { id: 'e', x: 3, y: 2, w: 2, h: 1, color: 'yellow', fixed: false },
+      { id: 'f', x: 4, y: 3, w: 1, h: 2, color: 'green', fixed: false },
+      { id: 'g', x: 2, y: 4, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'h', x: 0, y: 3, w: 1, h: 2, color: 'blue', fixed: true },
+      { id: 'i', x: 2, y: 3, w: 2, h: 1, color: 'teal', fixed: true },
+    ],
+    minMoves: 20,
+  },
+  // ─── Level 20: "Grandmaster" ── min 20 ────────────────
+  {
+    name: "Grandmaster",
+    cols: 6, rows: 6,
+    ball: { x: 0, y: 0 },
+    hole: { x: 5, y: 5 },
+    blocks: [
+      { id: 'a', x: 1, y: 0, w: 2, h: 1, color: 'blue', fixed: true },
+      { id: 'b', x: 0, y: 1, w: 1, h: 3, color: 'teal', fixed: false },
+      { id: 'c', x: 3, y: 1, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'd', x: 5, y: 1, w: 1, h: 2, color: 'purple', fixed: true },
+      { id: 'e', x: 2, y: 2, w: 1, h: 3, color: 'yellow', fixed: false },
+      { id: 'f', x: 3, y: 3, w: 2, h: 1, color: 'green', fixed: false },
+      { id: 'g', x: 1, y: 4, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'h', x: 3, y: 5, w: 2, h: 1, color: 'teal', fixed: true },
+      { id: 'j', x: 0, y: 5, w: 2, h: 1, color: 'purple', fixed: false },
+      { id: 'k', x: 4, y: 4, w: 1, h: 2, color: 'green', fixed: false },
+    ],
+    minMoves: 24,
+  },
+,
+  // ─── Level 21: "The Outer Limits" ── min 18 ─────────────────
+  {
+    name: "The Outer Limits",
+    cols: 7, rows: 7,
+    ball: { x: 0, y: 0 },
+    hole: { x: 6, y: 6 },
+    blocks: [
+      { id: 'a', x: 2, y: 0, w: 2, h: 1, color: 'blue', fixed: true },
+      { id: 'b', x: 0, y: 2, w: 1, h: 3, color: 'teal', fixed: false },
+      { id: 'c', x: 3, y: 1, w: 2, h: 1, color: 'orange', fixed: true },
+      { id: 'd', x: 1, y: 3, w: 2, h: 1, color: 'purple', fixed: false },
+      { id: 'e', x: 4, y: 3, w: 1, h: 3, color: 'yellow', fixed: false },
+      { id: 'f', x: 5, y: 5, w: 2, h: 1, color: 'green', fixed: true },
+      { id: 'g', x: 2, y: 4, w: 2, h: 2, color: 'blue', fixed: false },
+      { id: 'h', x: 0, y: 6, w: 3, h: 1, color: 'orange', fixed: false },
+    ],
+    minMoves: 18,
+  },
+  // ─── Level 22: "Sprawling City" ── min 20 ──────────────────
+  {
+    name: "Sprawling City",
+    cols: 7, rows: 7,
+    ball: { x: 6, y: 0 },
+    hole: { x: 0, y: 6 },
+    blocks: [
+      { id: 'a', x: 4, y: 0, w: 1, h: 3, color: 'teal', fixed: false },
+      { id: 'b', x: 5, y: 1, w: 2, h: 1, color: 'purple', fixed: true },
+      { id: 'c', x: 1, y: 1, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'd', x: 2, y: 2, w: 2, h: 2, color: 'blue', fixed: false },
+      { id: 'e', x: 0, y: 4, w: 1, h: 2, color: 'green', fixed: true },
+      { id: 'f', x: 5, y: 3, w: 1, h: 3, color: 'yellow', fixed: false },
+      { id: 'g', x: 3, y: 5, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'h', x: 1, y: 6, w: 2, h: 1, color: 'blue', fixed: true },
+      { id: 'i', x: 0, y: 2, w: 1, h: 2, color: 'teal', fixed: false },
+    ],
+    minMoves: 20,
+  },
+  // ─── Level 23: "Seven Seas" ── min 21 ──────────────────────
+  {
+    name: "Seven Seas",
+    cols: 7, rows: 7,
+    ball: { x: 3, y: 3 },
+    hole: { x: 6, y: 6 },
+    blocks: [
+      { id: 'a', x: 1, y: 1, w: 5, h: 1, color: 'blue', fixed: true },
+      { id: 'b', x: 1, y: 5, w: 4, h: 1, color: 'orange', fixed: false },
+      { id: 'c', x: 1, y: 2, w: 1, h: 3, color: 'teal', fixed: false },
+      { id: 'd', x: 5, y: 2, w: 1, h: 3, color: 'purple', fixed: false },
+      { id: 'e', x: 2, y: 2, w: 2, h: 1, color: 'yellow', fixed: false },
+      { id: 'f', x: 3, y: 4, w: 2, h: 1, color: 'green', fixed: true },
+    ],
+    minMoves: 21,
+  },
+  // ─── Level 24: "Grid Expansion" ── min 22 ──────────────────
+  {
+    name: "Grid Expansion",
+    cols: 7, rows: 7,
+    ball: { x: 0, y: 6 },
+    hole: { x: 6, y: 0 },
+    blocks: [
+      { id: 'v1', x: 1, y: 0, w: 1, h: 3, color: 'orange', fixed: false },
+      { id: 'h1', x: 2, y: 1, w: 2, h: 1, color: 'blue', fixed: true },
+      { id: 'h2', x: 0, y: 4, w: 3, h: 1, color: 'teal', fixed: false },
+      { id: 'v2', x: 3, y: 4, w: 1, h: 2, color: 'yellow', fixed: false },
+      { id: 'h3', x: 4, y: 4, w: 2, h: 1, color: 'purple', fixed: true },
+      { id: 'v3', x: 5, y: 1, w: 1, h: 3, color: 'green', fixed: false },
+      { id: 'h4', x: 4, y: 6, w: 2, h: 1, color: 'blue', fixed: false },
+      { id: 'v4', x: 0, y: 1, w: 1, h: 2, color: 'orange', fixed: true },
+    ],
+    minMoves: 22,
+  },
+  // ─── Level 25: "Dead End" ── min 24 ──────────────────────
+  {
+    name: "Dead End",
+    cols: 7, rows: 7,
+    ball: { x: 6, y: 3 },
+    hole: { x: 0, y: 3 },
+    blocks: [
+      { id: 'w1', x: 2, y: 1, w: 1, h: 5, color: 'blue', fixed: true },
+      { id: 'w2', x: 4, y: 1, w: 1, h: 5, color: 'teal', fixed: false },
+      { id: 'w3', x: 1, y: 6, w: 4, h: 1, color: 'purple', fixed: true },
+      { id: 'b1', x: 0, y: 1, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'b2', x: 5, y: 0, w: 2, h: 1, color: 'yellow', fixed: false },
+      { id: 'b3', x: 5, y: 5, w: 2, h: 1, color: 'green', fixed: false },
+      { id: 'b4', x: 3, y: 2, w: 1, h: 2, color: 'orange', fixed: false },
+    ],
+    minMoves: 24,
+  },
+  // ─── Level 26: "The Big Eight" ── min 25 ─────────────────
+  {
+    name: "The Big Eight",
+    cols: 8, rows: 8,
+    ball: { x: 0, y: 0 },
+    hole: { x: 7, y: 7 },
+    blocks: [
+      { id: '1', x: 1, y: 1, w: 2, h: 2, color: 'blue', fixed: false },
+      { id: '2', x: 4, y: 1, w: 3, h: 1, color: 'teal', fixed: true },
+      { id: '3', x: 1, y: 4, w: 1, h: 3, color: 'orange', fixed: false },
+      { id: '4', x: 3, y: 4, w: 3, h: 1, color: 'purple', fixed: true },
+      { id: '5', x: 4, y: 5, w: 1, h: 3, color: 'yellow', fixed: false },
+      { id: '6', x: 5, y: 2, w: 2, h: 2, color: 'green', fixed: false },
+      { id: '7', x: 0, y: 6, w: 2, h: 1, color: 'blue', fixed: true },
+      { id: '8', x: 0, y: 3, w: 2, h: 1, color: 'orange', fixed: false },
+    ],
+    minMoves: 25,
+  },
+  // ─── Level 27: "Traffic Nightmare" ── min 26 ─────────────
+  {
+    name: "Traffic Nightmare",
+    cols: 8, rows: 8,
+    ball: { x: 7, y: 0 },
+    hole: { x: 0, y: 7 },
+    blocks: [
+      { id: '1', x: 1, y: 0, w: 1, h: 4, color: 'teal', fixed: false },
+      { id: '2', x: 3, y: 1, w: 1, h: 3, color: 'blue', fixed: true },
+      { id: '3', x: 5, y: 0, w: 1, h: 3, color: 'purple', fixed: false },
+      { id: '4', x: 0, y: 5, w: 3, h: 1, color: 'orange', fixed: false },
+      { id: '5', x: 4, y: 5, w: 3, h: 1, color: 'yellow', fixed: true },
+      { id: '6', x: 2, y: 6, w: 1, h: 2, color: 'green', fixed: false },
+      { id: '7', x: 6, y: 4, w: 2, h: 1, color: 'blue', fixed: false },
+      { id: '8', x: 4, y: 2, w: 2, h: 1, color: 'orange', fixed: false },
+    ],
+    minMoves: 26,
+  },
+  // ─── Level 28: "Massive Maze" ── min 28 ──────────────────
+  {
+    name: "Massive Maze",
+    cols: 8, rows: 8,
+    ball: { x: 0, y: 7 },
+    hole: { x: 7, y: 0 },
+    blocks: [
+      { id: 'a', x: 0, y: 1, w: 3, h: 1, color: 'orange', fixed: true },
+      { id: 'b', x: 4, y: 0, w: 1, h: 3, color: 'blue', fixed: false },
+      { id: 'c', x: 6, y: 1, w: 1, h: 4, color: 'teal', fixed: true },
+      { id: 'd', x: 1, y: 3, w: 2, h: 1, color: 'purple', fixed: false },
+      { id: 'e', x: 3, y: 4, w: 2, h: 1, color: 'yellow', fixed: false },
+      { id: 'f', x: 4, y: 5, w: 1, h: 3, color: 'green', fixed: true },
+      { id: 'g', x: 0, y: 5, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'h', x: 2, y: 6, w: 2, h: 2, color: 'blue', fixed: false },
+      { id: 'i', x: 6, y: 5, w: 2, h: 1, color: 'teal', fixed: false },
+    ],
+    minMoves: 28,
+  },
+  // ─── Level 29: "Blockade Runner" ── min 30 ───────────────
+  {
+    name: "Blockade Runner",
+    cols: 8, rows: 8,
+    ball: { x: 0, y: 3 },
+    hole: { x: 7, y: 4 },
+    blocks: [
+      { id: 'a', x: 2, y: 1, w: 1, h: 6, color: 'blue', fixed: false },
+      { id: 'b', x: 5, y: 1, w: 1, h: 6, color: 'teal', fixed: false },
+      { id: 'c', x: 3, y: 0, w: 2, h: 2, color: 'orange', fixed: true },
+      { id: 'd', x: 3, y: 6, w: 2, h: 2, color: 'purple', fixed: true },
+      { id: 'e', x: 0, y: 1, w: 2, h: 1, color: 'yellow', fixed: false },
+      { id: 'f', x: 6, y: 6, w: 2, h: 1, color: 'green', fixed: false },
+      { id: 'g', x: 3, y: 3, w: 2, h: 1, color: 'blue', fixed: false },
+      { id: 'h', x: 3, y: 4, w: 2, h: 1, color: 'orange', fixed: false },
+    ],
+    minMoves: 30,
+  },
+  // ─── Level 30: "The Long Road" ── min 32 ─────────────────
+  {
+    name: "The Long Road",
+    cols: 8, rows: 8,
+    ball: { x: 0, y: 0 },
+    hole: { x: 7, y: 7 },
+    blocks: [
+      { id: 'a', x: 1, y: 0, w: 2, h: 2, color: 'purple', fixed: false },
+      { id: 'b', x: 4, y: 0, w: 1, h: 3, color: 'teal', fixed: true },
+      { id: 'c', x: 6, y: 0, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'd', x: 0, y: 3, w: 3, h: 1, color: 'blue', fixed: false },
+      { id: 'e', x: 2, y: 4, w: 1, h: 3, color: 'yellow', fixed: true },
+      { id: 'f', x: 4, y: 4, w: 2, h: 1, color: 'green', fixed: false },
+      { id: 'g', x: 3, y: 6, w: 3, h: 1, color: 'teal', fixed: false },
+      { id: 'h', x: 6, y: 2, w: 1, h: 3, color: 'purple', fixed: false },
+      { id: 'i', x: 6, y: 6, w: 2, h: 1, color: 'orange', fixed: true },
+      { id: 'j', x: 0, y: 5, w: 1, h: 3, color: 'blue', fixed: false }
+    ],
+    minMoves: 32,
+  },
+  // ─── Level 31: "Immense Challenge" ── min 35 ──────────────
+  {
+    name: "Immense Challenge",
+    cols: 9, rows: 9,
+    ball: { x: 4, y: 4 },
+    hole: { x: 8, y: 8 },
+    blocks: [
+      { id: 'a', x: 2, y: 2, w: 5, h: 1, color: 'blue', fixed: true },
+      { id: 'b', x: 2, y: 6, w: 5, h: 1, color: 'orange', fixed: true },
+      { id: 'c', x: 2, y: 3, w: 1, h: 3, color: 'teal', fixed: false },
+      { id: 'd', x: 6, y: 3, w: 1, h: 3, color: 'purple', fixed: false },
+      { id: 'e', x: 3, y: 3, w: 3, h: 1, color: 'yellow', fixed: false },
+      { id: 'f', x: 3, y: 5, w: 3, h: 1, color: 'green', fixed: false },
+      { id: 'g', x: 0, y: 4, w: 2, h: 1, color: 'blue', fixed: false },
+      { id: 'h', x: 7, y: 4, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'i', x: 4, y: 0, w: 1, h: 2, color: 'teal', fixed: false },
+      { id: 'j', x: 4, y: 7, w: 1, h: 2, color: 'purple', fixed: false }
+    ],
+    minMoves: 35,
+  },
+  // ─── Level 32: "Perimeter Breach" ── min 36 ───────────────
+  {
+    name: "Perimeter Breach",
+    cols: 9, rows: 9,
+    ball: { x: 0, y: 0 },
+    hole: { x: 8, y: 8 },
+    blocks: [
+      { id: 'a', x: 1, y: 0, w: 1, h: 3, color: 'blue', fixed: false },
+      { id: 'b', x: 3, y: 0, w: 3, h: 1, color: 'orange', fixed: true },
+      { id: 'c', x: 7, y: 0, w: 1, h: 4, color: 'teal', fixed: false },
+      { id: 'd', x: 0, y: 4, w: 4, h: 1, color: 'purple', fixed: true },
+      { id: 'e', x: 5, y: 2, w: 2, h: 2, color: 'yellow', fixed: false },
+      { id: 'f', x: 1, y: 6, w: 3, h: 1, color: 'green', fixed: false },
+      { id: 'g', x: 5, y: 5, w: 1, h: 4, color: 'blue', fixed: true },
+      { id: 'h', x: 7, y: 5, w: 2, h: 1, color: 'orange', fixed: false },
+      { id: 'i', x: 2, y: 8, w: 2, h: 1, color: 'teal', fixed: false },
+      { id: 'j', x: 6, y: 7, w: 2, h: 2, color: 'purple', fixed: false }
+    ],
+    minMoves: 36,
+  },
+  // ─── Level 33: "The Great Wall" ── min 38 ─────────────────
+  {
+    name: "The Great Wall",
+    cols: 9, rows: 9,
+    ball: { x: 0, y: 4 },
+    hole: { x: 8, y: 4 },
+    blocks: [
+      { id: '1', x: 4, y: 0, w: 1, h: 4, color: 'teal', fixed: true },
+      { id: '2', x: 4, y: 5, w: 1, h: 4, color: 'teal', fixed: true },
+      { id: '3', x: 2, y: 2, w: 1, h: 3, color: 'blue', fixed: false },
+      { id: '4', x: 6, y: 4, w: 1, h: 3, color: 'orange', fixed: false },
+      { id: '5', x: 0, y: 1, w: 3, h: 1, color: 'purple', fixed: false },
+      { id: '6', x: 6, y: 1, w: 3, h: 1, color: 'yellow', fixed: false },
+      { id: '7', x: 1, y: 7, w: 3, h: 1, color: 'green', fixed: false },
+      { id: '8', x: 5, y: 7, w: 3, h: 1, color: 'blue', fixed: false },
+      { id: '9', x: 2, y: 4, w: 2, h: 1, color: 'orange', fixed: true },
+      { id: 'A', x: 5, y: 4, w: 2, h: 1, color: 'purple', fixed: true }
+    ],
+    minMoves: 38,
+  },
+  // ─── Level 34: "Brain Fry" ── min 40 ──────────────────────
+  {
+    name: "Brain Fry",
+    cols: 9, rows: 9,
+    ball: { x: 8, y: 0 },
+    hole: { x: 0, y: 8 },
+    blocks: [
+      { id: 'a', x: 6, y: 0, w: 2, h: 2, color: 'blue', fixed: false },
+      { id: 'b', x: 8, y: 1, w: 1, h: 3, color: 'orange', fixed: true },
+      { id: 'c', x: 4, y: 2, w: 3, h: 1, color: 'teal', fixed: false },
+      { id: 'd', x: 1, y: 1, w: 2, h: 2, color: 'purple', fixed: false },
+      { id: 'e', x: 0, y: 3, w: 4, h: 1, color: 'yellow', fixed: true },
+      { id: 'f', x: 2, y: 5, w: 1, h: 4, color: 'green', fixed: false },
+      { id: 'g', x: 4, y: 4, w: 2, h: 2, color: 'blue', fixed: false },
+      { id: 'h', x: 6, y: 5, w: 3, h: 1, color: 'orange', fixed: false },
+      { id: 'i', x: 4, y: 7, w: 4, h: 1, color: 'teal', fixed: true },
+      { id: 'j', x: 0, y: 6, w: 2, h: 1, color: 'purple', fixed: false }
+    ],
+    minMoves: 40,
+  },
+  // ─── Level 35: "The Zenith" ── min 45 ─────────────────────
+  {
+    name: "The Zenith",
+    cols: 9, rows: 9,
+    ball: { x: 4, y: 4 },
+    hole: { x: 8, y: 0 },
+    blocks: [
+      { id: 'a', x: 3, y: 3, w: 3, h: 1, color: 'blue', fixed: true },
+      { id: 'b', x: 3, y: 5, w: 3, h: 1, color: 'orange', fixed: true },
+      { id: 'c', x: 3, y: 4, w: 1, h: 1, color: 'teal', fixed: false },
+      { id: 'd', x: 5, y: 4, w: 1, h: 1, color: 'purple', fixed: false },
+      { id: 'e', x: 1, y: 1, w: 2, h: 2, color: 'yellow', fixed: false },
+      { id: 'f', x: 6, y: 1, w: 2, h: 2, color: 'green', fixed: false },
+      { id: 'g', x: 1, y: 6, w: 2, h: 2, color: 'blue', fixed: false },
+      { id: 'h', x: 6, y: 6, w: 2, h: 2, color: 'orange', fixed: false },
+      { id: 'i', x: 4, y: 0, w: 1, h: 3, color: 'teal', fixed: true },
+      { id: 'j', x: 4, y: 6, w: 1, h: 3, color: 'purple', fixed: true },
+      { id: 'k', x: 0, y: 4, w: 3, h: 1, color: 'yellow', fixed: false },
+      { id: 'l', x: 6, y: 4, w: 3, h: 1, color: 'green', fixed: false }
+    ],
+    minMoves: 45,
+  }
 ];
+
 
 // ── State ──────────────────────────────────────────────────
 let currentLevel  = 0;
@@ -418,7 +692,10 @@ function isCellOccupied(x, y, excludeKey) {
   // Check blocks
   for (let i = 0; i < gameState.blocks.length; i++) {
     if (excludeKey === i) continue;
-    if (gameState.blocks[i].x === x && gameState.blocks[i].y === y) return true;
+    const b = gameState.blocks[i];
+    const bw = b.w || 1;
+    const bh = b.h || 1;
+    if (x >= b.x && x < b.x + bw && y >= b.y && y < b.y + bh) return true;
   }
   return false;
 }
@@ -435,15 +712,32 @@ function getValidMovesForPiece(piece, excludeKey) {
     { dx:  1, dy: 0 }, // right
   ];
 
-  for (const { dx, dy } of directions) {
-    let cx = piece.x + dx;
-    let cy = piece.y + dy;
+  const pw = piece.w || 1;
+  const ph = piece.h || 1;
 
-    while (cx >= 0 && cx < gameState.cols && cy >= 0 && cy < gameState.rows) {
-      if (isCellOccupied(cx, cy, excludeKey)) break; // blocked
-      moves.push({ x: cx, y: cy });
+  for (const { dx, dy } of directions) {
+    let cx = piece.x;
+    let cy = piece.y;
+
+    while (true) {
       cx += dx;
       cy += dy;
+
+      // Check bounds
+      if (cx < 0 || cx + pw > gameState.cols || cy < 0 || cy + ph > gameState.rows) break;
+
+      // Check collisions for all occupied cells of the piece
+      let collision = false;
+      for (let w = 0; w < pw; w++) {
+        for (let h = 0; h < ph; h++) {
+          if (isCellOccupied(cx + w, cy + h, excludeKey)) {
+            collision = true;
+          }
+        }
+      }
+      if (collision) break;
+
+      moves.push({ x: cx, y: cy });
     }
   }
 
@@ -542,14 +836,24 @@ function renderBoard() {
     }
   }
 
+  // Find current selected piece dimensions to display valid moves accurately
+  let selW = 1, selH = 1;
+  if (selectedPiece !== null && selectedPiece !== 'ball') {
+    const b = gameState.blocks[selectedPiece];
+    if (b) {
+      selW = b.w || 1;
+      selH = b.h || 1;
+    }
+  }
+
   // Valid move highlights
   validMoves.forEach(m => {
     const highlight = document.createElement('div');
     highlight.className = 'valid-move';
     highlight.style.left   = (m.x * cp + gap / 2) + 'px';
     highlight.style.top    = (m.y * cp + gap / 2) + 'px';
-    highlight.style.width  = (cp - gap) + 'px';
-    highlight.style.height = (cp - gap) + 'px';
+    highlight.style.width  = (selW * cp - gap) + 'px';
+    highlight.style.height = (selH * cp - gap) + 'px';
 
     highlight.addEventListener('pointerdown', (e) => {
       e.stopPropagation();
@@ -576,10 +880,12 @@ function renderBoard() {
     if (b.fixed) el.classList.add('fixed');
     if (selectedPiece === idx) el.classList.add('selected');
 
+    const bw = b.w || 1;
+    const bh = b.h || 1;
     el.style.left   = (b.x * cp + gap / 2) + 'px';
     el.style.top    = (b.y * cp + gap / 2) + 'px';
-    el.style.width  = (cp - gap) + 'px';
-    el.style.height = (cp - gap) + 'px';
+    el.style.width  = (bw * cp - gap) + 'px';
+    el.style.height = (bh * cp - gap) + 'px';
 
     if (b.fixed) {
       el.innerHTML = '<span class="block-icon">🧱</span>';
